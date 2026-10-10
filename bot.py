@@ -1,6 +1,8 @@
 import logging
-from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
+import asyncio
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
+from aiogram.filters import Command
 
 TOKEN = "8826773951:AAHc1YlXzMYCqz28GbnwpRXSfOOvgxIUrg8"
 CHANNEL_USERNAME = "@dram2ir"
@@ -8,7 +10,7 @@ ADMIN_CHAT_ID = 48460135
 MINI_APP_URL = "https://shokouhi61.github.io/dramrobot/"
 
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
 users_db = {}
 
@@ -21,36 +23,39 @@ async def check_membership(user_id: int) -> bool:
         print(f"Error checking membership: {e}")
     return False
 
-@dp.message_handler(commands=['start'])
+@dp.message(Command("start"))
 async def send_welcome(message: types.Message):
     user_id = message.from_user.id
     
     is_member = await check_membership(user_id)
     if not is_member:
-        keyboard = InlineKeyboardMarkup(row_width=1)
-        keyboard.add(
-            InlineKeyboardButton(text="📢 عضویت در کانال", url="https://t.me/dram2ir"),
-            InlineKeyboardButton(text="✅ عضو شدم، بررسی مجدد", callback_data="check_sub")
-        )
+        builder = InlineKeyboardBuilder()
+        builder.button(text="📢 عضویت در کانال", url="https://t.me/dram2ir")
+        builder.button(text="✅ عضو شدم، بررسی مجدد", callback_data="check_sub")
+        builder.adjust(1)
+        
         await message.answer(
             "⚠️ برای استفاده از بازار درام، لطفاً ابتدا در کانال ما عضو شوید:",
-            reply_markup=keyboard
+            reply_markup=builder.as_markup()
         )
         return
 
     if user_id not in users_db:
-        keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-        keyboard.add(KeyboardButton(text="📱 اشتراک‌گذاری شماره تلفن", request_contact=True))
+        kb = ReplyKeyboardBuilder()
+        kb.button(text="📱 اشتراک‌گذاری شماره تلفن", request_contact=True)
+        kb.adjust(1)
+        
         await message.answer(
             "خوش آمدید! برای ادامه و تایید هویت، لطفاً شماره تلفن خود را ارسال کنید:",
-            reply_markup=keyboard
+            reply_markup=kb.as_markup(resize_keyboard=True, one_time_keyboard=True)
         )
     else:
-        keyboard = InlineKeyboardMarkup(row_width=1)
-        keyboard.add(InlineKeyboardButton(text="🛒 ورود به مینی‌اپ بازار درام", web_app=WebAppInfo(url=MINI_APP_URL)))
-        await message.answer("شما قبلاً ثبت‌نام کرده‌اید. از طریق دکمه زیر می‌توانید وارد مینی‌اپ شوید:", reply_markup=keyboard)
+        builder = InlineKeyboardBuilder()
+        builder.button(text="🛒 ورود به مینی‌اپ بازار درام", web_app=types.WebAppInfo(url=MINI_APP_URL))
+        builder.adjust(1)
+        await message.answer("شما قبلاً ثبت‌نام کرده‌اید. از طریق دکمه زیر می‌توانید وارد مینی‌اپ شوید:", reply_markup=builder.as_markup())
 
-@dp.message_handler(content_types=['contact'])
+@dp.message(F.contact)
 async def get_contact(message: types.Message):
     user_id = message.from_user.id
     phone_number = message.contact.phone_number
@@ -76,31 +81,35 @@ async def get_contact(message: types.Message):
     except Exception as e:
         print(f"Failed to send report to admin: {e}")
     
-    keyboard = InlineKeyboardMarkup(row_width=1)
-    keyboard.add(InlineKeyboardButton(text="🛒 ورود به مینی‌اپ بازار درام", web_app=WebAppInfo(url=MINI_APP_URL)))
+    builder = InlineKeyboardBuilder()
+    builder.button(text="🛒 ورود به مینی‌اپ بازار درام", web_app=types.WebAppInfo(url=MINI_APP_URL))
+    builder.adjust(1)
     
     await message.answer(
         "✅ شماره تلفن شما با موفقیت ثبت شد!\nاکنون می‌توانید از طریق دکمه زیر وارد مینی‌اپ شوید:",
-        reply_markup=keyboard
+        reply_markup=builder.as_markup()
     )
 
-@dp.callback_query_handler(lambda c: c.data == 'check_sub')
+@dp.callback_query(F.data == "check_sub")
 async def callback_check_sub(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     is_member = await check_membership(user_id)
     
     if is_member:
-        await bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
-        keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-        keyboard.add(KeyboardButton(text="📱 اشتراک‌گذاری شماره تلفن", request_contact=True))
-        await bot.send_message(
-            chat_id=callback.message.chat.id,
-            text="عضویت شما تایید شد! حالا لطفاً شماره تلفن خود را ارسال کنید:",
-            reply_markup=keyboard
+        await callback.message.delete()
+        kb = ReplyKeyboardBuilder()
+        kb.button(text="📱 اشتراک‌گذاری شماره تلفن", request_contact=True)
+        kb.adjust(1)
+        await callback.message.answer(
+            "عضویت شما تایید شد! حالا لطفاً شماره تلفن خود را ارسال کنید:",
+            reply_markup=kb.as_markup(resize_keyboard=True, one_time_keyboard=True)
         )
     else:
         await callback.answer("❌ شما هنوز در کانال عضو نشده‌اید!", show_alert=True)
 
-if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
-                              
+async def main():
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+        
