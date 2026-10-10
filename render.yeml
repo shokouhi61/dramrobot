@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: dramrobot
+    env: python
+    buildCommand: pip install --upgrade pip && pip install aiogram==3.13.1
+    startCommand: python3 bot.py
