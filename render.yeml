@@ -2,5 +2,9 @@ services:
   - type: web
     name: dramrobot
     env: python
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
     buildCommand: pip install --upgrade pip && pip install aiogram==3.13.1
-    startCommand: python3 bot.py
+    startCommand: python bot.py
