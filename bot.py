@@ -8,6 +8,7 @@ from aiogram.filters import Command
 TOKEN = "8826773951:AAHc1YlXzMYCqz28GbnwpRXSfOOvgxIUrg8"
 CHANNEL_USERNAME = "@dram2ir"
 ADMIN_CHAT_ID = 48460135
+MINI_APP_URL = "https://shokouhi61.github.io/dramrobot/"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -55,7 +56,11 @@ async def send_welcome(message: types.Message):
             reply_markup=kb.as_markup(resize_keyboard=True, one_time_keyboard=True)
         )
     else:
-        await message.answer("شما قبلاً ثبت‌نام کرده‌اید. از طریق دکمه زیر می‌توانید وارد مینی‌اپ شوید.")
+        # اگر قبلاً ثبت‌نام کرده بود، دکمه ورود به مینی‌اپ را نشان بده
+        builder = InlineKeyboardBuilder()
+        builder.button(text="🛒 ورود به مینی‌اپ بازار درام", web_app=types.WebAppInfo(url=MINI_APP_URL))
+        builder.adjust(1)
+        await message.answer("شما قبلاً ثبت‌نام کرده‌اید. از طریق دکمه زیر می‌توانید وارد مینی‌اپ شوید:", reply_markup=builder.as_markup())
 
 # دریافت شماره تلفن کاربر
 @dp.message(F.contact)
@@ -71,11 +76,6 @@ async def get_contact(message: types.Message):
         "username": username
     }
     
-    await message.answer(
-        "✅ شماره تلفن شما با موفقیت ثبت شد!",
-        reply_markup=types.ReplyKeyboardRemove()
-    )
-    
     # ارسال گزارش لیستی به ادمین
     report_text = (
         "📋 **گزارش ثبت‌نام کاربر جدید:**\n"
@@ -90,7 +90,15 @@ async def get_contact(message: types.Message):
     except Exception as e:
         print(f"Failed to send report to admin: {e}")
     
-    await message.answer("اکنون می‌توانید از امکانات بازار درام استفاده کنید.")
+    # ساخت دکمه مینی‌اپ برای کاربر پس از ثبت شماره
+    builder = InlineKeyboardBuilder()
+    builder.button(text="🛒 ورود به مینی‌اپ بازار درام", web_app=types.WebAppInfo(url=MINI_APP_URL))
+    builder.adjust(1)
+    
+    await message.answer(
+        "✅ شماره تلفن شما با موفقیت ثبت شد!\nاکنون می‌توانید از طریق دکمه زیر وارد مینی‌اپ شوید:",
+        reply_markup=builder.as_markup()
+    )
 
 # دکمه بررسی مجدد عضویت
 @dp.callback_query(F.data == "check_sub")
@@ -115,4 +123,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-  
+    
