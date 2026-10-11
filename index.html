@@ -3,37 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازار درام</title>
+    <title>بازار درام - نیازمندی‌های خرید و فروش</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --primary-color: #0088cc;
+            --secondary-color: #28a745;
+            --danger-color: #dc3545;
+            --border-color: #dee2e6;
+        }
         body {
             font-family: Tahoma, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            text-align: center;
-            padding: 50px 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: #fff;
-            padding: 30px;
+        }
+        /* ویجت نرخ لحظه‌ای */
+        .ticker-box {
+            background: linear-gradient(135deg, #0088cc, #005580);
+            color: white;
+            padding: 12px;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        h1 {
-            color: #2c3e50;
+        .ticker-box a {
+            color: #ffeb3b;
+            text-decoration: none;
+            font-weight: bold;
         }
-        p {
-            font-size: 16px;
+        /* هدر پروفایل کوچک */
+        .profile-card {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+        .profile-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-left: 12px;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
             color: #555;
+        }
+        .profile-info h3 {
+            margin: 0 0 4px 0;
+            font-size: 15px;
+        }
+        .profile-info p {
+            margin: 0;
+            font-size: 13px;
+            color: #6c757d;
+        }
+        /* فرم ثبت آگهی */
+        .form-box {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+        .form-box h2 {
+            font-size: 16px;
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: Tahoma, sans-serif;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: Tahoma, sans-serif;
+        }
+        button:active {
+            opacity: 0.8;
+        }
+        /* لیست آگهی‌ها */
+        .ad-item {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 5px;
+        }
+        .badge-buy { background-color: var(--secondary-color); }
+        .badge-sell { background-color: var(--danger-color); }
+        .ad-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 8px;
+        }
+        .chat-btn {
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        .support-bar {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .support-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🛒 مینی‌اپ بازار درام</h1>
-        <p>خوش آمدید! رابط کاربری مینی‌اپ شما با موفقیت متصل شد.</p>
-        <p>به زودی اطلاعات و بخش‌های معاملاتی در این صفحه بارگذاری خواهند شد.</p>
+
+<div class="container">
+    <!-- کلید و لینک دائمی نرخ لحظه‌ای درام -->
+    <div class="ticker-box">
+        📊 نرخ لحظه‌ای درام و ارزها<br>
+        <a href="https://www.tgju.org/profile/price_amd" target="_blank">مشاهده آنلاین در TGJU 📈</a>
     </div>
+
+    <!-- پروفایل کوچک کاربر -->
+    <div class="profile-card">
+        <div class="profile-avatar" id="user-avatar">👤</div>
+        <div class="profile-info">
+            <h3 id="user-name">کاربر مهمان</h3>
+            <p id="user-bio">درباره من: آماده تبادل امن درام و تومان</p>
+        </div>
+    </div>
+
+    <!-- فرم ثبت آگهی -->
+    <div class="form-box">
+        <h2>➕ ثبت آگهی جدید</h2>
+        <select id="ad-type">
+            <option value="فروش">فروش درام</option>
+            <option value="خرید">خرید درام</option>
+        </select>
+        <input type="text" id="ad-amount" placeholder="مقدار درام (مثلا: ۱۰۰,۰۰۰ درام)">
+        <textarea id="ad-desc" placeholder="توضیحات (شرایط معامله، قیمت پیشنهادی، شهر و...)" rows="2"></textarea>
+        <button onclick="postAd()">انتشار آگهی</button>
+    </div>
+
+    <!-- لیست آگهی‌های دیگران -->
+    <h2>📋 آگهی‌های فعال بازار</h2>
+    <div id="ads-list">
+        <!-- آگهی نمونه -->
+        <div class="ad-item">
+            <span class="badge badge-sell">فروش</span>
+            <strong>۵۰,۰۰۰ درام</strong>
+            <p style="margin: 5px 0; font-size: 13px;">تحویل حضوری در ایروان یا کارت به کارت تومان.</p>
+            <div class="ad-footer">
+                <span style="font-size: 12px; color: #666;">ارسال‌کننده: خسرو</span>
+                <a href="https://t.me/shokouhi61" target="_blank" class="chat-btn">💬 چت با فروشنده</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- پشتیبانی داخل برنامه -->
+    <div class="support-bar">
+        <a href="https://t.me/shokouhi61" target="_blank" class="support-link">🎧 ارتباط با پشتیبانی درون‌برنامه</a>
+    </div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    // تنظیم اطلاعات تلگرام کاربر در پروفایل کوچک
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        const user = tg.initDataUnsafe.user;
+        document.getElementById('user-name').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+        if (user.username) {
+            document.getElementById('user-bio').innerText = `آیدی: @${user.username}`;
+        }
+    }
+
+    function postAd() {
+        const type = document.getElementById('ad-type').value;
+        const amount = document.getElementById('ad-amount').value;
+        const desc = document.getElementById('ad-desc').value;
+
+        if (!amount) {
+            alert('لطفاً مقدار درام را وارد کنید.');
+            return;
+        }
+
+        const adsList = document.getElementById('ads-list');
+        const badgeClass = type === 'خرید' ? 'badge-buy' : 'badge-sell';
+        
+        let userName = "کاربر تلگرام";
+        let userUsername = "shokouhi61";
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userName = tg.initDataUnsafe.user.first_name;
+            if (tg.initDataUnsafe.user.username) {
+                userUsername = tg.initDataUnsafe.user.username;
+            }
+        }
+
+        const newAdHTML = `
+            <div class="ad-item">
+                <span class="badge ${badgeClass}">${type}</span>
+                <strong>${amount}</strong>
+                <p style="margin: 5px 0; font-size: 13px;">${desc}</p>
+                <div class="ad-footer">
+                    <span style="font-size: 12px; color: #666;">ارسال‌کننده: ${userName}</span>
+                    <a href="https://t.me/${userUsername}" target="_blank" class="chat-btn">💬 چت مستقیم</a>
+                </div>
+            </div>
+        `;
+
+        adsList.insertAdjacentHTML('afterbegin', newAdHTML);
+        
+        // پاک کردن فرم
+        document.getElementById('ad-amount').value = '';
+        document.getElementById('ad-desc').value = '';
+        alert('آگهی شما با موفقیت در بازار ثبت شد!');
+    }
+</script>
+
 </body>
-</html>
+    </html>
+    
